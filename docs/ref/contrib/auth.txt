@@ -34,12 +34,12 @@ Fields
 
         .. admonition:: Usernames and Unicode
 
-            Django originally accepted only ASCII letters in usernames.
-            Although it wasn't a deliberate choice, Unicode characters have
-            always been accepted when using Python 3. Django 1.10 officially
-            added Unicode support in usernames, keeping the ASCII-only behavior
-            on Python 2, with the option to customize the behavior using
-            :attr:`.User.username_validator`.
+            Django originally accepted only ASCII letters and numbers in
+            usernames. Although it wasn't a deliberate choice, Unicode
+            characters have always been accepted when using Python 3. Django
+            1.10 officially added Unicode support in usernames, keeping the
+            ASCII-only behavior on Python 2, with the option to customize the
+            behavior using :attr:`.User.username_validator`.
 
         .. versionchanged:: 1.10
 
@@ -144,6 +144,15 @@ Attributes
 
             In older versions, this was a method. Backwards-compatibility
             support for using it as a method will be removed in Django 2.0.
+
+        .. admonition:: Don't use the ``is`` operator for comparisons!
+
+            To allow the ``is_authenticated`` and ``is_anonymous`` attributes
+            to also work as methods, the attributes are  ``CallableBool``
+            objects. Thus, until the deprecation period ends in Django 2.0, you
+            can't compare these properties using the ``is`` operator. That is,
+            ``request.user.is_authenticated is True`` always evaluate to
+            ``False``.
 
     .. attribute:: is_anonymous
 
@@ -417,15 +426,15 @@ Validators
 
     .. versionadded:: 1.10
 
-    A field validator allowing only ASCII letters, in addition to ``@``, ``.``,
-    ``+``, ``-``, and ``_``. The default validator for ``User.username`` on
-    Python 2.
+    A field validator allowing only ASCII letters and numbers, in addition to
+    ``@``, ``.``, ``+``, ``-``, and ``_``. The default validator for
+    ``User.username`` on Python 2.
 
 .. class:: validators.UnicodeUsernameValidator
 
     .. versionadded:: 1.10
 
-    A field validator allowing Unicode letters, in addition to ``@``, ``.``,
+    A field validator allowing Unicode characters, in addition to ``@``, ``.``,
     ``+``, ``-``, and ``_``. The default validator for ``User.username`` on
     Python 3.
 
