@@ -117,6 +117,14 @@ class OracleTests(unittest.TestCase):
         connection.ensure_connection()
         self.assertEqual(connection.connection.encoding, "UTF-8")
         self.assertEqual(connection.connection.nencoding, "UTF-8")
+        # Client encoding may be changed in OPTIONS.
+        new_connection = connection.copy()
+        new_connection.settings_dict['OPTIONS']['encoding'] = 'ISO-8859-2'
+        new_connection.settings_dict['OPTIONS']['nencoding'] = 'ASCII'
+        new_connection.ensure_connection()
+        self.assertEqual(new_connection.connection.encoding, 'ISO-8859-2')
+        self.assertEqual(new_connection.connection.nencoding, 'ASCII')
+        new_connection.close()
 
     def test_order_of_nls_parameters(self):
         # an 'almost right' datetime should work with configured
@@ -127,6 +135,14 @@ class OracleTests(unittest.TestCase):
             # wasn't the case.
             cursor.execute(query)
             self.assertEqual(cursor.fetchone()[0], 1)
+
+    def test_sequence_name_truncation(self):
+        seq_name = connection.ops._get_sequence_name('schema_authorwithevenlongee869')
+        self.assertEqual(seq_name, 'SCHEMA_AUTHORWITHEVENLOB0B8_SQ')
+
+    def test_trigger_name_truncation(self):
+        trigger_name = connection.ops._get_trigger_name('schema_authorwithevenlongee869')
+        self.assertEqual(trigger_name, 'SCHEMA_AUTHORWITHEVENLOB0B8_TR')
 
 
 @unittest.skipUnless(connection.vendor == 'sqlite', "Test only for SQLite")
